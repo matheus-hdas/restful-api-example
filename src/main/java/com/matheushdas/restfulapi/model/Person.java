@@ -23,6 +23,24 @@ public class Person {
     @Column(nullable = false)
     private String gender;
 
+    public Person() {
+    }
+
+    public Person(Long id, String firstName, String lastName, String address, String gender) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.gender = gender;
+    }
+
+    public Person(String firstName, String lastName, String address, String gender) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.gender = gender;
+    }
+
     public Long getId() {
         return id;
     }
