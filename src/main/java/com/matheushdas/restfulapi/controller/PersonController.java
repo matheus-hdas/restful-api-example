@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.matheushdas.restfulapi.util.MediaType.*;
+
 @RestController
 @RequestMapping("/api/person")
 public class PersonController {
@@ -19,24 +21,24 @@ public class PersonController {
         this.personService = personService;
     }
 
-    @GetMapping
+    @GetMapping(produces = { JSON, XML, YML })
     public ResponseEntity<List<PersonResponse>> getAllPeople() {
         return ResponseEntity.ok(personService.findAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = { JSON, XML, YML })
     public ResponseEntity<PersonResponse> getPersonById(@PathVariable Long id) {
         return ResponseEntity.ok(personService.findById(id));
     }
 
-    @PostMapping
+    @PostMapping(produces = { JSON, XML, YML }, consumes = { JSON, XML, YML })
     public ResponseEntity<PersonResponse> createPerson(@RequestBody CreatePersonRequest person) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(personService.save(person));
     }
 
-    @PutMapping
+    @PutMapping(produces = { JSON, XML, YML }, consumes = { JSON, XML, YML })
     public ResponseEntity<PersonResponse> updatePerson(@RequestBody UpdatePersonRequest person) {
         return ResponseEntity.ok(personService.update(person));
     }
