@@ -1,5 +1,6 @@
 package com.matheushdas.restfulapi.mapper;
 
+import com.matheushdas.restfulapi.controller.PersonController;
 import com.matheushdas.restfulapi.dto.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.PersonResponse;
 import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
@@ -9,17 +10,22 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Component
 public class PersonMapper {
 
     public PersonResponse toResponse(Person data) {
-        return new PersonResponse(
+        PersonResponse response = new PersonResponse(
                 data.getId(),
                 data.getFirstName(),
                 data.getLastName(),
                 data.getAddress(),
                 data.getGender()
         );
+        response.add(linkTo(methodOn(PersonController.class).getPersonById(data.getId())).withSelfRel());
+        return response;
     }
 
     public List<PersonResponse> toResponseList(List<Person> data) {
