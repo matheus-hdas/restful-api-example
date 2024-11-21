@@ -10,22 +10,18 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @Component
 public class PersonMapper {
 
     public PersonResponse toResponse(Person data) {
-        PersonResponse response = new PersonResponse(
+
+        return new PersonResponse(
                 data.getId(),
                 data.getFirstName(),
                 data.getLastName(),
                 data.getAddress(),
                 data.getGender()
         );
-        response.add(linkTo(methodOn(PersonController.class).getPersonById(data.getId())).withSelfRel());
-        return response;
     }
 
     public List<PersonResponse> toResponseList(List<Person> data) {

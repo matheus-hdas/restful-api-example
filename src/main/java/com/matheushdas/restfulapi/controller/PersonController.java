@@ -15,7 +15,7 @@ import static com.matheushdas.restfulapi.util.MediaType.*;
 @RestController
 @RequestMapping("/api/person")
 public class PersonController {
-    private final PersonService personService;
+    private PersonService personService;
 
     public PersonController(PersonService personService) {
         this.personService = personService;
