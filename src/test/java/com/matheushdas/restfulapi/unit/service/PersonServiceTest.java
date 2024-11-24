@@ -1,8 +1,8 @@
 package com.matheushdas.restfulapi.unit.service;
 
-import com.matheushdas.restfulapi.dto.CreatePersonRequest;
-import com.matheushdas.restfulapi.dto.PersonResponse;
-import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.CreatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.PersonResponse;
+import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;

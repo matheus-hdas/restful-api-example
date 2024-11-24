@@ -1,4 +1,4 @@
-package com.matheushdas.restfulapi.dto;
+package com.matheushdas.restfulapi.dto.person;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

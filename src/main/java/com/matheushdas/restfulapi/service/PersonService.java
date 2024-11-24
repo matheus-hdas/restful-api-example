@@ -1,16 +1,14 @@
 package com.matheushdas.restfulapi.service;
 
 import com.matheushdas.restfulapi.controller.PersonController;
-import com.matheushdas.restfulapi.dto.CreatePersonRequest;
-import com.matheushdas.restfulapi.dto.PersonResponse;
+import com.matheushdas.restfulapi.dto.person.CreatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.PersonResponse;
 import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;
-import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.repository.PersonRepository;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 
@@ -54,9 +52,7 @@ public class PersonService {
     public PersonResponse save(CreatePersonRequest person) {
         if(person == null) throw new RequiredObjectIsNullException("Person cannot be null!");
         PersonResponse result = personMapper.toResponse(
-                personRepository.save(
-                        personMapper.toEntity(person)
-                )
+                personRepository.save(personMapper.toEntity(person))
         );
         result.add(
                 linkTo(

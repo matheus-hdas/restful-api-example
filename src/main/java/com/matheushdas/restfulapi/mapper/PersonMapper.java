@@ -1,9 +1,8 @@
 package com.matheushdas.restfulapi.mapper;
 
-import com.matheushdas.restfulapi.controller.PersonController;
-import com.matheushdas.restfulapi.dto.CreatePersonRequest;
-import com.matheushdas.restfulapi.dto.PersonResponse;
-import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.CreatePersonRequest;
+import com.matheushdas.restfulapi.dto.person.PersonResponse;
+import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.model.Person;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +11,7 @@ import java.util.List;
 
 @Component
 public class PersonMapper {
-
     public PersonResponse toResponse(Person data) {
-
         return new PersonResponse(
                 data.getId(),
                 data.getFirstName(),
