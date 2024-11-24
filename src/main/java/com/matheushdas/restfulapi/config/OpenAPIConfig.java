@@ -17,7 +17,6 @@ public class OpenAPIConfig {
                         .version("v1")
                         .description("Just a example Restful API")
                         .license(new License().name("Apache 2.0"))
-
                 );
     }
 }
