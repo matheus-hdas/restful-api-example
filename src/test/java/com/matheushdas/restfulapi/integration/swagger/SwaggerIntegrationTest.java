@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SwaggerIntegrationTest extends ContainerEngine {
 
     @Test
-    public void shouldDisplaySwaggerUiPage() {
+    public void shouldDisplaySwaggerUiPage_whenRequested() {
         String body = given()
                 .basePath("/swagger-ui/index.html")
                 .port(TestContextConfig.SERVER_PORT)

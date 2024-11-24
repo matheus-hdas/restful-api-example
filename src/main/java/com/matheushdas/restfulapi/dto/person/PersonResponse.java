@@ -9,19 +9,19 @@ import java.util.Objects;
 @JsonPropertyOrder({"id", "first_name", "last_name", "address", "gender", "_links"})
 public class PersonResponse extends RepresentationModel<PersonResponse> {
     @JsonProperty("id")
-    private final Long key;
+    private Long key;
 
     @JsonProperty("first_name")
-    private final String firstName;
+    private String firstName;
 
     @JsonProperty("last_name")
     private String lastName;
 
     @JsonProperty("address")
-    private final String address;
+    private String address;
 
     @JsonProperty("gender")
-    private final String gender;
+    private String gender;
 
     public PersonResponse(Long key, String firstName, String lastName, String address, String gender) {
         this.key = key;
@@ -31,24 +31,46 @@ public class PersonResponse extends RepresentationModel<PersonResponse> {
         this.gender = gender;
     }
 
+    public PersonResponse() {}
+
     public Long getKey() {
         return key;
+    }
+
+    public void setKey(Long key) {
+        this.key = key;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
         return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getAddress() {
         return address;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getGender() {
         return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override
