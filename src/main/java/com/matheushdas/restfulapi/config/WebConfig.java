@@ -2,19 +2,24 @@ package com.matheushdas.restfulapi.config;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.matheushdas.restfulapi.converter.YamlHttpMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${cors.origin-patterns:default}")
+    private String corsPatterns = "";
+
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.favorParameter(false)
@@ -40,5 +45,15 @@ public class WebConfig implements WebMvcConfigurer {
         MappingJackson2HttpMessageConverter yamlConverter = new MappingJackson2HttpMessageConverter(new YAMLMapper());
         yamlConverter.setSupportedMediaTypes(List.of(MediaType.parseMediaType("application/x-yaml")));
         converters.add(yamlConverter);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        String[] allowedOrigins = corsPatterns.split(",");
+
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedOriginPatterns(allowedOrigins)
+                .allowCredentials(true);
     }
 }
