@@ -3,6 +3,8 @@ package com.matheushdas.restfulapi.unit.service;
 import com.matheushdas.restfulapi.dto.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.PersonResponse;
 import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
+import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
+import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;
 import com.matheushdas.restfulapi.model.Person;
 import com.matheushdas.restfulapi.repository.PersonRepository;
@@ -91,6 +93,15 @@ public class PersonServiceTest {
     }
 
     @Test
+    void shouldThrowResourceNotFoundException_whenFindByIdWithNoRecordedId() {
+        when(personRepository.findById(0L)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            personService.findById(0L);
+        });
+    }
+
+    @Test
     void shouldCreateEntityAndSendPersonResponseWithHateoasLink_whenSave() {
         CreatePersonRequest request = input.mockCreateRequest(1);
         Person person = input.mockEntity(1);
@@ -113,6 +124,13 @@ public class PersonServiceTest {
         assertEquals(person.getLastName(), result.getLastName());
         assertEquals(person.getAddress(), result.getAddress());
         assertEquals(person.getGender(), result.getGender());
+    }
+
+    @Test
+    void shouldThrowRequiredObjectIsNullException_whenCreateWithNull() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
+            personService.save(null);
+        });
     }
 
     @Test
@@ -139,5 +157,12 @@ public class PersonServiceTest {
         assertEquals(person.getLastName(), result.getLastName());
         assertEquals(person.getAddress(), result.getAddress());
         assertEquals(person.getGender(), result.getGender());
+    }
+
+    @Test
+    void shouldThrowRequiredObjectIsNullException_whenUpdateWithNull() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
+            personService.update(null);
+        });
     }
 }
