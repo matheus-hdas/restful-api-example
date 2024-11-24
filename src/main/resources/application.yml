@@ -12,3 +12,7 @@ spring:
     properties:
       hibernate:
       show-sql: false
+spring-doc:
+  pathsToMatch: /api/**/**
+  swagger-ui:
+    use-root-path: true

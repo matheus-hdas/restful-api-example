@@ -14,8 +14,14 @@ import java.util.Date;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
-    public final ProblemDetail handleAllExceptions(RestAPIException ex) {
-        return ex.toProblemDetail();
+    public final ProblemDetail handleAllExceptions(Exception ex) {
+        ProblemDetail pb = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        pb.setTitle("Internal Error");
+        pb.setDetail("Error into internal Server");
+        pb.setProperty("timestamp", new Date());
+
+        return pb;
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
