@@ -1,0 +1,17 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: restful-api-example
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+      show-sql: false
+spring-doc:
+  pathsToMatch: /api/**/**
+  swagger-ui:
+    use-root-path: true
