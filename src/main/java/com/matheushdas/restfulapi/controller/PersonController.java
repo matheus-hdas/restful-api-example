@@ -4,6 +4,7 @@ import com.matheushdas.restfulapi.dto.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.PersonResponse;
 import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
 import com.matheushdas.restfulapi.service.PersonService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +33,14 @@ public class PersonController {
     }
 
     @PostMapping(produces = { JSON, XML, YML }, consumes = { JSON, XML, YML })
-    public ResponseEntity<PersonResponse> createPerson(@RequestBody CreatePersonRequest person) {
+    public ResponseEntity<PersonResponse> createPerson(@RequestBody @Valid CreatePersonRequest person) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(personService.save(person));
     }
 
     @PutMapping(produces = { JSON, XML, YML }, consumes = { JSON, XML, YML })
-    public ResponseEntity<PersonResponse> updatePerson(@RequestBody UpdatePersonRequest person) {
+    public ResponseEntity<PersonResponse> updatePerson(@RequestBody @Valid UpdatePersonRequest person) {
         return ResponseEntity.ok(personService.update(person));
     }
 

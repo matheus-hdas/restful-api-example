@@ -3,10 +3,14 @@ package com.matheushdas.restfulapi.service;
 import com.matheushdas.restfulapi.controller.PersonController;
 import com.matheushdas.restfulapi.dto.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.PersonResponse;
+import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
+import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;
 import com.matheushdas.restfulapi.dto.UpdatePersonRequest;
 import com.matheushdas.restfulapi.repository.PersonRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 
@@ -37,7 +41,8 @@ public class PersonService {
 
     public PersonResponse findById(Long id) {
         PersonResponse result =
-                personMapper.toResponse(personRepository.findById(id).orElseThrow());
+                personMapper.toResponse(personRepository.findById(id).orElseThrow(
+                        () -> new ResourceNotFoundException("No records found for this ID!")));
         result.add(
                 linkTo(
                         methodOn(PersonController.class)
@@ -47,6 +52,7 @@ public class PersonService {
     }
 
     public PersonResponse save(CreatePersonRequest person) {
+        if(person == null) throw new RequiredObjectIsNullException("Person cannot be null!");
         PersonResponse result = personMapper.toResponse(
                 personRepository.save(
                         personMapper.toEntity(person)
@@ -61,6 +67,7 @@ public class PersonService {
     }
 
     public PersonResponse update(UpdatePersonRequest person) {
+        if(person == null) throw new RequiredObjectIsNullException("Person cannot be null!");
         if(personRepository.existsById(person.id())) {
             PersonResponse result =
                     personMapper.toResponse(
@@ -72,7 +79,7 @@ public class PersonService {
                             .withSelfRel());
             return result;
         }
-        throw new RuntimeException();
+        throw new ResourceNotFoundException("No records found for this ID!");
     }
 
     public void delete(Long id) {
