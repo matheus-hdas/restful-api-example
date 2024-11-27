@@ -2,6 +2,11 @@ server:
   port: 8888
 cors:
   origin-patterns: http://localhost:8080,http://localhost:3000
+security:
+  jwt:
+    token:
+      secret-key: 5lrn8df
+      expire-length: 360000
 spring:
   application:
     name: restful-api-example
