@@ -1,8 +1,8 @@
 package com.matheushdas.restfulapi.exception.handler;
 
+import com.matheushdas.restfulapi.exception.InvalidJwtAuthException;
 import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
-import com.matheushdas.restfulapi.exception.RestAPIException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,6 +42,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RequiredObjectIsNullException.class)
     public final ProblemDetail handleRequiredObjectIsNullException(RequiredObjectIsNullException ex) {
+        return ex.toProblemDetail();
+    }
+
+    @ExceptionHandler(InvalidJwtAuthException.class)
+    public final ProblemDetail handleInvalidJwtAuthException(InvalidJwtAuthException ex) {
         return ex.toProblemDetail();
     }
 }
