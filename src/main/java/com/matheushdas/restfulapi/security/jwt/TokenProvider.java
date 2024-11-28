@@ -57,6 +57,17 @@ public class TokenProvider {
         );
     }
 
+    public LoginResponse refreshAccessToken(String refreshToken) {
+        if(refreshToken.contains("Bearer ")) refreshToken = refreshToken.substring("Bearer ".length());
+
+        DecodedJWT decoded = decodeToken(refreshToken);
+        return generateAuthorizationToken(
+                decoded.getSubject(),
+                decoded.getClaim("roles")
+                        .asList(String.class)
+        );
+    }
+
     private String getAccessToken(String username, List<String> roles, Date now, Date expiration) {
         String issuerUrl = ServletUriComponentsBuilder
                 .fromCurrentContextPath().build().toUriString();
@@ -96,6 +107,7 @@ public class TokenProvider {
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 
+        if(bearerToken == null) return null;
         if(bearerToken.startsWith("Bearer ")) return bearerToken.substring("Bearer ".length());
         return null;
     }
