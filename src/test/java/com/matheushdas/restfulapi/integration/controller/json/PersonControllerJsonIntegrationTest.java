@@ -1,4 +1,4 @@
-package com.matheushdas.restfulapi.integration.controller;
+package com.matheushdas.restfulapi.integration.controller.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -47,7 +47,7 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
                 .body(request)
                 .when().post()
                 .then().statusCode(200)
-                .extract().body().as(LoginResponse.class).accessToken();
+                .extract().body().as(LoginResponse.class).getAccessToken();
 
         specification = new RequestSpecBuilder()
                 .addHeader(TestContextConfig.AUTHORIZATION_HEADER_PARAM, "Bearer " + response)
