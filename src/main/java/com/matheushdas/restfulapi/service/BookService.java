@@ -63,17 +63,25 @@ public class BookService {
 
     public BookResponse update(UpdateBookRequest book) {
         if(book == null) throw new RequiredObjectIsNullException("Book cannot be null!");
-        if(bookRepository.existsById(book.id())) {
-            BookResponse result = bookMapper.toResponse(
-                    bookRepository.save(bookMapper.toEntity(book)));
-            result.add(
-                    linkTo(
-                            methodOn(BookController.class)
-                                    .getBookById(result.getKey()))
-                            .withSelfRel());
-            return result;
-        }
-        throw new ResourceNotFoundException("No records found for this ID!");
+
+        BookResponse result = bookMapper.toResponse(
+             bookRepository.findById(book.id())
+                     .map(toUpdate -> {
+                         toUpdate.setTitle(book.title());
+                         toUpdate.setAuthor(book.author());
+                         toUpdate.setLaunchDate(book.launchDate());
+                         toUpdate.setPrice(book.price());
+                         return bookRepository.save(toUpdate);
+                     })
+                     .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"))
+        );
+
+        result.add(
+                linkTo(
+                        methodOn(BookController.class)
+                                .getBookById(result.getKey()))
+                        .withSelfRel());
+        return result;
     }
 
     public void delete(Long id) {

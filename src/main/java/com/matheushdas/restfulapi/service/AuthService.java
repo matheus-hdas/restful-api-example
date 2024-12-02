@@ -31,12 +31,12 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest login) {
-        User user = userRepository.findByUsernameOrEmail(login.usernameOrEmail());
+        User user = userRepository.findByUsernameOrEmail(login.getUsernameOrEmail());
 
         if(user == null) throw new ResourceNotFoundException("No records found for this username or email!");
 
         String username = user.getUsername();
-        String password = login.password();
+        String password = login.getPassword();
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
@@ -54,7 +54,7 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest register) {
         User user = userMapper.toEntity(register);
-        user.setPassword(passwordEncoder.encode(register.password()));
+        user.setPassword(passwordEncoder.encode(register.getPassword()));
 
         return userMapper.toResponse(userRepository.save(user));
     }

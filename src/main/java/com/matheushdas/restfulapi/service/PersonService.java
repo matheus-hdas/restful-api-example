@@ -7,6 +7,7 @@ import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;
 import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
+import com.matheushdas.restfulapi.model.Person;
 import com.matheushdas.restfulapi.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
@@ -63,19 +64,27 @@ public class PersonService {
     }
 
     public PersonResponse update(UpdatePersonRequest person) {
-        if(person == null) throw new RequiredObjectIsNullException("Person cannot be null!");
-        if(personRepository.existsById(person.id())) {
-            PersonResponse result =
-                    personMapper.toResponse(
-                            personRepository.save(personMapper.toEntity(person)));
-            result.add(
-                    linkTo(
-                            methodOn(PersonController.class)
-                                    .getPersonById(result.getKey()))
-                            .withSelfRel());
-            return result;
-        }
-        throw new ResourceNotFoundException("No records found for this ID!");
+        if (person == null) throw new RequiredObjectIsNullException("Person cannot be null!");
+
+        PersonResponse result = personMapper.toResponse(
+                personRepository.findById(person.id())
+                        .map(toUpdate -> {
+                            toUpdate.setFirstName(person.firstName());
+                            toUpdate.setLastName(person.lastName());
+                            toUpdate.setAddress(person.address());
+                            toUpdate.setGender(person.gender());
+                            return personRepository.save(toUpdate);
+                        })
+                        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"))
+        );
+
+        result.add(
+                linkTo(
+                        methodOn(PersonController.class)
+                                .getPersonById(result.getKey()))
+                        .withSelfRel()
+        );
+        return result;
     }
 
     public void delete(Long id) {

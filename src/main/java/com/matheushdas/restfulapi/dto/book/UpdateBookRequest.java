@@ -7,7 +7,7 @@ import java.util.Date;
 
 
 public record UpdateBookRequest(
-        @JsonProperty("id") @NotBlank Long id,
+        @JsonProperty("id") Long id,
         @JsonProperty("title") @NotBlank String title,
         @JsonProperty("author") @NotBlank String author,
         @JsonProperty("launch_date") @NotBlank Date launchDate,
