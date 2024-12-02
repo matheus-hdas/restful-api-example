@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matheushdas.restfulapi.config.TestContextConfig;
+import com.matheushdas.restfulapi.dto.auth.LoginRequest;
+import com.matheushdas.restfulapi.dto.auth.LoginResponse;
 import com.matheushdas.restfulapi.dto.person.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.person.PersonResponse;
 import com.matheushdas.restfulapi.integration.container.ContainerEngine;
@@ -25,30 +27,44 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
-    private static PersonResponse personResponse;
     private static CreatePersonRequest createPersonRequest;
 
     @BeforeAll
     public static void setUp() {
-        personResponse = new PersonResponse();
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Test
     @Order(1)
-    public void shouldReturnCreatedPersonResponse_whenCreatePerson() throws JsonProcessingException {
-        mockCreateRequest();
+    public void authentication() {
+        LoginRequest request = new LoginRequest("TestUsername", "testpassword");
+
+        String response = given()
+                .basePath("/auth/login")
+                .port(TestContextConfig.SERVER_PORT)
+                .contentType(JSON)
+                .body(request)
+                .when().post()
+                .then().statusCode(200)
+                .extract().body().as(LoginResponse.class).accessToken();
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
+                .addHeader(TestContextConfig.AUTHORIZATION_HEADER_PARAM, "Bearer " + response)
                 .setBasePath("/api/person")
                 .setPort(TestContextConfig.SERVER_PORT)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
+    }
+
+    @Test
+    @Order(2)
+    public void shouldReturnCreatedPersonResponse_whenCreatePerson() throws JsonProcessingException {
+        mockCreateRequest();
 
         String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
                 .contentType(JSON)
                 .body(createPersonRequest)
                 .when().post()
@@ -73,17 +89,10 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     public void shouldReturnInvalidCorsRequest_whenCreatePersonWithInvalidOrigin() {
-        specification = new RequestSpecBuilder()
-                .addHeader(TestContextConfig.ORIGIN_HEADER_PARAM, "http://invalidorigin.com")
-                .setBasePath("/api/person")
-                .setPort(TestContextConfig.SERVER_PORT)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
-
         String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://invalidorigin.com")
                 .contentType(JSON)
                 .body(createPersonRequest)
                 .when().post()
