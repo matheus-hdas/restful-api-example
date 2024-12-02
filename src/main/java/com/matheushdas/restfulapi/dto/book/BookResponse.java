@@ -1,5 +1,6 @@
 package com.matheushdas.restfulapi.dto.book;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.hateoas.RepresentationModel;
@@ -19,10 +20,14 @@ public class BookResponse extends RepresentationModel<BookResponse> {
     private String author;
 
     @JsonProperty("launch_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date launchDate;
 
     @JsonProperty("price")
     private Double price;
+
+    public BookResponse() {
+    }
 
     public BookResponse(Long key, String title, String author, Date launchDate, Double price) {
         this.key = key;
