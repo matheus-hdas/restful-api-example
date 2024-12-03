@@ -6,6 +6,9 @@ security:
       secret-key: 5lrn8df
       expire-length: 360000
 spring:
+  jackson:
+    date-format: yyyy-MM-dd
+    time-zone: UTC
   application:
     name: restful-api-example
   datasource:

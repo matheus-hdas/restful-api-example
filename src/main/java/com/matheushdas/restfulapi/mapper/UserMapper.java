@@ -20,10 +20,10 @@ public class UserMapper {
 
     public User toEntity(RegisterRequest data) {
         return new User(
-                data.username(),
-                data.fullName(),
-                data.email(),
-                data.password(),
+                data.getUsername(),
+                data.getEmail(),
+                data.getFullName(),
+                data.getPassword(),
                 true,
                 true,
                 true,
