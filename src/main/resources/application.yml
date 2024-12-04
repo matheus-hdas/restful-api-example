@@ -6,6 +6,8 @@ security:
       secret-key: 5lrn8df
       expire-length: 360000
 spring:
+  flyway:
+    locations: classpath:db/migration
   jackson:
     date-format: yyyy-MM-dd
     time-zone: UTC

@@ -17,7 +17,8 @@ public class PersonMapper {
                 data.getFirstName(),
                 data.getLastName(),
                 data.getAddress(),
-                data.getGender()
+                data.getGender(),
+                data.getEnabled()
         );
     }
 
@@ -35,7 +36,8 @@ public class PersonMapper {
                 data.firstName(),
                 data.lastName(),
                 data.address(),
-                data.gender()
+                data.gender(),
+                true
         );
     }
 
@@ -45,7 +47,9 @@ public class PersonMapper {
                 data.firstName(),
                 data.lastName(),
                 data.address(),
-                data.gender()
+                data.gender(),
+                true
+
         );
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
 
-@JsonPropertyOrder({"id", "first_name", "last_name", "address", "gender", "_links"})
+@JsonPropertyOrder({"id", "first_name", "last_name", "address", "gender", "enabled", "_links"})
 public class PersonResponse extends RepresentationModel<PersonResponse> {
     @JsonProperty("id")
     private Long key;
@@ -23,15 +23,20 @@ public class PersonResponse extends RepresentationModel<PersonResponse> {
     @JsonProperty("gender")
     private String gender;
 
-    public PersonResponse(Long key, String firstName, String lastName, String address, String gender) {
+    @JsonProperty("enabled")
+    private Boolean enabled;
+
+    public PersonResponse() {
+    }
+
+    public PersonResponse(Long key, String firstName, String lastName, String address, String gender, Boolean enabled) {
         this.key = key;
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.gender = gender;
+        this.enabled = enabled;
     }
-
-    public PersonResponse() {}
 
     public Long getKey() {
         return key;
@@ -73,16 +78,24 @@ public class PersonResponse extends RepresentationModel<PersonResponse> {
         this.gender = gender;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         PersonResponse that = (PersonResponse) o;
-        return Objects.equals(key, that.key) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(address, that.address) && Objects.equals(gender, that.gender);
+        return Objects.equals(key, that.key) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(address, that.address) && Objects.equals(gender, that.gender) && Objects.equals(enabled, that.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), key, firstName, lastName, address, gender);
+        return Objects.hash(super.hashCode(), key, firstName, lastName, address, gender, enabled);
     }
 }

@@ -126,6 +126,29 @@ public class PersonController {
         return ResponseEntity.ok(personService.update(person));
     }
 
+    @PatchMapping(value = "/{id}", produces = { JSON, XML, YML })
+    @Operation(
+            summary = "Disable a person",
+            description = "Patch any person field",
+            tags = {"People"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = { @Content(
+                                    schema = @Schema(implementation = PersonResponse.class)
+                            ) }
+                    ),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content),
+            }
+    )
+    public ResponseEntity<PersonResponse> disablePerson(@PathVariable Long id) {
+        return ResponseEntity.ok(personService.disablePerson(id));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Deletes a person",

@@ -7,8 +7,8 @@ import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.PersonMapper;
 import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
-import com.matheushdas.restfulapi.model.Person;
 import com.matheushdas.restfulapi.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -78,6 +78,22 @@ public class PersonService {
                         .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"))
         );
 
+        result.add(
+                linkTo(
+                        methodOn(PersonController.class)
+                                .getPersonById(result.getKey()))
+                        .withSelfRel()
+        );
+        return result;
+    }
+
+
+    @Transactional
+    public PersonResponse disablePerson(Long id) {
+        personRepository.disablePerson(id);
+        PersonResponse result =
+                personMapper.toResponse(personRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!")));
         result.add(
                 linkTo(
                         methodOn(PersonController.class)
