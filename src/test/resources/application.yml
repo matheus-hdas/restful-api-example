@@ -2,6 +2,8 @@ server:
   port: 8888
 cors:
   origin-patterns: http://localhost:8080,http://localhost:3000
+file:
+  upload-dir: /home/runner/work/restful-api-example/UploadDir
 security:
   jwt:
     token:
