@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: "21"
-        distribution: "eclipse"
+        distribution: "adopt"
         cache: maven
 
     - name: Maven Build
