@@ -9,9 +9,13 @@ import com.matheushdas.restfulapi.mapper.PersonMapper;
 import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.repository.PersonRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -20,22 +24,51 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class PersonService {
     private PersonRepository personRepository;
     private PersonMapper personMapper;
+    private PagedResourcesAssembler<PersonResponse> resourcesAssembler;
 
-    public PersonService(PersonRepository personRepository, PersonMapper personMapper) {
+    public PersonService(PersonRepository personRepository, PersonMapper personMapper, PagedResourcesAssembler<PersonResponse> resourcesAssembler) {
         this.personRepository = personRepository;
         this.personMapper = personMapper;
+        this.resourcesAssembler = resourcesAssembler;
     }
 
-    public List<PersonResponse> findAll() {
-        return personMapper
-                .toResponseList(personRepository.findAll())
-                .stream()
+    public PagedModel<EntityModel<PersonResponse>> findAll(Pageable pageable) {
+        Page<PersonResponse> page = personMapper
+                .toResponsePage(personRepository.findAll(pageable))
                 .map(p -> p.add(
                         linkTo(
                                 methodOn(PersonController.class)
                                         .getPersonById(p.getKey()))
-                                .withSelfRel()))
-                .toList();
+                                .withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(PersonController.class)
+                        .getAllPeople(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc"))
+                .withSelfRel();
+        return resourcesAssembler.toModel(page, link);
+    }
+
+    public PagedModel<EntityModel<PersonResponse>> findByName(String firstName, Pageable pageable) {
+        Page<PersonResponse> page = personMapper
+                .toResponsePage(personRepository.findByName(firstName, pageable))
+                .map(p -> p.add(
+                        linkTo(
+                                methodOn(PersonController.class)
+                                        .getPersonById(p.getKey()))
+                                .withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(PersonController.class)
+                        .getPeopleByName(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc",
+                                firstName))
+                .withSelfRel();
+        return resourcesAssembler.toModel(page, link);
     }
 
     public PersonResponse findById(Long id) {

@@ -28,7 +28,6 @@ public class AuthController {
         return response == null ?
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!") :
                 ResponseEntity.ok(response);
-
     }
 
     @PutMapping("/refresh/{username}")
@@ -40,7 +39,6 @@ public class AuthController {
         return response == null ?
                 ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!") :
                 ResponseEntity.ok(response);
-
     }
 
     @PostMapping("/register")

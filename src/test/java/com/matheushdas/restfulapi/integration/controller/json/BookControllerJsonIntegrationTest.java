@@ -20,6 +20,8 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.Date;
 import java.util.List;
@@ -126,30 +128,75 @@ public class BookControllerJsonIntegrationTest extends ContainerEngine {
 
     @Test
     @Order(4)
-    public void shouldReturnListBookResponse_whenFindAll() throws JsonProcessingException {
-
-        List<BookResponse> body = given().spec(specification)
+    public void shouldReturnPageBookResponse_whenFindAll() throws JsonProcessingException {
+        String body = given().spec(specification)
                 .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
                 .contentType(JSON)
                 .when().get()
                 .then().statusCode(200)
-                .extract().body().as(new TypeRef<List<BookResponse>>() {});
+                .extract().body().asString();
 
-        for (BookResponse foundedBook : body) {
-            assertNotNull(foundedBook);
-            assertNotNull(foundedBook.getKey());
-            assertNotNull(foundedBook.getTitle());
-            assertNotNull(foundedBook.getAuthor());
-            assertNotNull(foundedBook.getLaunchDate());
-            assertNotNull(foundedBook.getPrice());
+        PagedModel<EntityModel<BookResponse>> parsedBody = objectMapper.readValue(body, PagedModel.class);
 
-            assertEquals("TestTitle", foundedBook.getTitle());
-            assertEquals("TestAuthor", foundedBook.getAuthor());
+        for (EntityModel<BookResponse> foundedBook : parsedBody) {
+            assertNotNull(foundedBook.getContent());
+            assertNotNull(foundedBook.getContent().getKey());
+            assertNotNull(foundedBook.getContent().getTitle());
+            assertNotNull(foundedBook.getContent().getAuthor());
+            assertNotNull(foundedBook.getContent().getLaunchDate());
+            assertNotNull(foundedBook.getContent().getPrice());
+
+            assertEquals("TestTitle", foundedBook.getContent().getTitle());
+            assertEquals("TestAuthor", foundedBook.getContent().getAuthor());
         }
     }
 
     @Test
     @Order(5)
+    public void shouldReturnPageValidHateoasLinks_whenFindAll() throws JsonProcessingException {
+        String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
+                .contentType(JSON)
+                .when().get()
+                .then().statusCode(200)
+                .extract().body().asString();
+
+        System.out.println(body);
+
+        assertTrue(body.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/book/1\"}}"));
+        assertTrue(body.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/book?page=0&size=12&direction=asc\"}}"));
+
+        assertTrue(body.contains("\"page\":{\"size\":12,\"totalElements\":1,\"totalPages\":1,\"number\":0}}"));
+    }
+
+    @Test
+    @Order(6)
+    public void shouldReturnPageBookResponseWithNameLikeGiven_whenFindByName() throws JsonProcessingException {
+        String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
+                .contentType(JSON)
+                .pathParam("title", "testtitle")
+                .when().get("/search/{title}")
+                .then().statusCode(200)
+                .extract().body().asString();
+
+        PagedModel<EntityModel<BookResponse>> parsedBody = objectMapper.readValue(body, PagedModel.class);
+
+        for (EntityModel<BookResponse> foundedBook : parsedBody) {
+            assertNotNull(foundedBook.getContent());
+            assertNotNull(foundedBook.getContent().getKey());
+            assertNotNull(foundedBook.getContent().getTitle());
+            assertNotNull(foundedBook.getContent().getAuthor());
+            assertNotNull(foundedBook.getContent().getLaunchDate());
+            assertNotNull(foundedBook.getContent().getPrice());
+
+            assertEquals("TestTitle", foundedBook.getContent().getTitle());
+            assertEquals("TestAuthor", foundedBook.getContent().getAuthor());
+        }
+    }
+
+    @Test
+    @Order(7)
     public void shouldReturnUpdatedBookResponse_whenUpdateBook() throws JsonProcessingException {
         mockUpdateRequest();
 
@@ -177,7 +224,7 @@ public class BookControllerJsonIntegrationTest extends ContainerEngine {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     public void shouldDeleteBookWithGivenIdRecord_whenDeleteBook() {
         given().spec(specification)
                 .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")

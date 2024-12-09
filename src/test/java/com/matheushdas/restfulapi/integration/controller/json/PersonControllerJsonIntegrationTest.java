@@ -11,15 +11,14 @@ import com.matheushdas.restfulapi.dto.person.PersonResponse;
 import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.integration.container.ContainerEngine;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
 import static com.matheushdas.restfulapi.util.MediaType.JSON;
 import static io.restassured.RestAssured.given;
@@ -123,33 +122,81 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
 
     @Test
     @Order(4)
-    public void shouldReturnListPersonResponse_whenFindAll() throws JsonProcessingException {
-
-        List<PersonResponse> body = given().spec(specification)
+    public void shouldReturnPagePersonResponse_whenFindAll() throws JsonProcessingException {
+        String body = given().spec(specification)
                 .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
                 .contentType(JSON)
                 .when().get()
                 .then().statusCode(200)
-                .extract().body().as(new TypeRef<List<PersonResponse>>() {});
+                .extract().body().asString();
 
-        for(PersonResponse foundedPerson : body) {
+        PagedModel<EntityModel<PersonResponse>> parsedBody = objectMapper.readValue(body, PagedModel.class);
+
+        for(EntityModel<PersonResponse> foundedPerson : parsedBody) {
             assertNotNull(foundedPerson);
-            assertNotNull(foundedPerson.getKey());
-            assertNotNull(foundedPerson.getFirstName());
-            assertNotNull(foundedPerson.getLastName());
-            assertNotNull(foundedPerson.getAddress());
-            assertNotNull(foundedPerson.getGender());
+            assertNotNull(foundedPerson.getContent().getKey());
+            assertNotNull(foundedPerson.getContent().getFirstName());
+            assertNotNull(foundedPerson.getContent().getLastName());
+            assertNotNull(foundedPerson.getContent().getAddress());
+            assertNotNull(foundedPerson.getContent().getGender());
 
-            assertEquals(1L, foundedPerson.getKey());
-            assertEquals("TestFirstName", foundedPerson.getFirstName());
-            assertEquals("TestLastName", foundedPerson.getLastName());
-            assertEquals("TestAddress", foundedPerson.getAddress());
-            assertEquals("Male", foundedPerson.getGender());
+            assertEquals(1L, foundedPerson.getContent().getKey());
+            assertEquals("TestFirstName", foundedPerson.getContent().getFirstName());
+            assertEquals("TestLastName", foundedPerson.getContent().getLastName());
+            assertEquals("TestAddress", foundedPerson.getContent().getAddress());
+            assertEquals("Male", foundedPerson.getContent().getGender());
         }
     }
 
     @Test
     @Order(5)
+    public void shouldReturnPageValidHateoasLinks_whenFindAll() throws JsonProcessingException {
+        String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
+                .contentType(JSON)
+                .when().get()
+                .then().statusCode(200)
+                .extract().body().asString();
+
+        System.out.println(body);
+
+        assertTrue(body.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person/1\"}}"));
+        assertTrue(body.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8888/api/person?page=0&size=12&direction=asc\"}}"));
+
+        assertTrue(body.contains("\"page\":{\"size\":12,\"totalElements\":1,\"totalPages\":1,\"number\":0}}"));
+    }
+
+    @Test
+    @Order(6)
+    public void shouldReturnPagePersonResponseWithNameLikeGiven_whenFindByName() throws JsonProcessingException {
+        String body = given().spec(specification)
+                .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
+                .contentType(JSON)
+                .pathParam("firstName", "TestFirstName")
+                .when().get("/search/{firstName}")
+                .then().statusCode(200)
+                .extract().body().asString();
+
+        PagedModel<EntityModel<PersonResponse>> parsedBody = objectMapper.readValue(body, PagedModel.class);
+
+        for(EntityModel<PersonResponse> foundedPerson : parsedBody) {
+            assertNotNull(foundedPerson);
+            assertNotNull(foundedPerson.getContent().getKey());
+            assertNotNull(foundedPerson.getContent().getFirstName());
+            assertNotNull(foundedPerson.getContent().getLastName());
+            assertNotNull(foundedPerson.getContent().getAddress());
+            assertNotNull(foundedPerson.getContent().getGender());
+
+            assertEquals(1L, foundedPerson.getContent().getKey());
+            assertEquals("TestFirstName", foundedPerson.getContent().getFirstName());
+            assertEquals("TestLastName", foundedPerson.getContent().getLastName());
+            assertEquals("TestAddress", foundedPerson.getContent().getAddress());
+            assertEquals("Male", foundedPerson.getContent().getGender());
+        }
+    }
+
+    @Test
+    @Order(7)
     public void shouldReturnUpdatedPersonResponse_whenUpdatePerson() throws JsonProcessingException {
         mockUpdateRequest();
 
@@ -178,7 +225,7 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     public void shouldDeletePersonWithGivenIdRecord_whenDeletePerson() {
         given().spec(specification)
                 .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://localhost:3000")
@@ -196,7 +243,7 @@ public class PersonControllerJsonIntegrationTest extends ContainerEngine {
     }
 
     @Test
-    @Order(7)
+    @Order(9)
     public void shouldReturnInvalidCorsRequest_whenAnyRequestWithInvalidOrigin() {
         String body = given().spec(specification)
                 .header(TestContextConfig.ORIGIN_HEADER_PARAM, "http://invalidorigin.com")

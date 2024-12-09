@@ -4,6 +4,7 @@ import com.matheushdas.restfulapi.dto.book.BookResponse;
 import com.matheushdas.restfulapi.dto.book.CreateBookRequest;
 import com.matheushdas.restfulapi.dto.book.UpdateBookRequest;
 import com.matheushdas.restfulapi.model.Book;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class BookMapper {
             result.add(this.toResponse(b));
         }
         return result;
+    }
+
+    public Page<BookResponse> toResponsePage(Page<Book> data) {
+        return data.map(book -> this.toResponse(book));
     }
 
     public Book toEntity(CreateBookRequest data) {

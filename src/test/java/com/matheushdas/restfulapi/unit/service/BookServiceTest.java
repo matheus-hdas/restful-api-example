@@ -10,16 +10,12 @@ import com.matheushdas.restfulapi.model.Book;
 import com.matheushdas.restfulapi.repository.BookRepository;
 import com.matheushdas.restfulapi.service.BookService;
 import com.matheushdas.restfulapi.unit.mock.BookMockProvider;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,31 +39,6 @@ public class BookServiceTest {
     void setUp() {
         input = new BookMockProvider();
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void shouldReturnListBookResponseWithHateoasLink_whenFindAll() {
-        List<Book> books = input.mockEntityList();
-
-        when(bookRepository.findAll()).thenReturn(books);
-        when(bookMapper.toResponseList(books)).thenReturn(input.mockVOList());
-
-        int i = 0;
-
-        for(BookResponse result : bookService.findAll()) {
-            assertNotNull(result);
-            assertNotNull(result.getKey());
-            assertNotNull(result.getLinks());
-
-            assertTrue(result.toString().contains("links: [</api/book/" + i + ">;rel=\"self\"]"));
-
-            assertEquals(books.get(i).getId(), result.getKey());
-            assertEquals(books.get(i).getTitle(), result.getTitle());
-            assertEquals(books.get(i).getAuthor(), result.getAuthor());
-            assertEquals(books.get(i).getLaunchDate(), result.getLaunchDate());
-            assertEquals(books.get(i).getPrice(), result.getPrice());
-            i++;
-        }
     }
 
     @Test
@@ -139,8 +110,7 @@ public class BookServiceTest {
         Book book = input.mockEntity(1);
 
 
-        when(bookRepository.existsById(request.id())).thenReturn(true);
-        when(bookMapper.toEntity(request)).thenReturn(book);
+        when(bookRepository.findById(request.id())).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.toResponse(book)).thenReturn(input.mockVO(1));
 

@@ -4,6 +4,7 @@ import com.matheushdas.restfulapi.dto.person.CreatePersonRequest;
 import com.matheushdas.restfulapi.dto.person.PersonResponse;
 import com.matheushdas.restfulapi.dto.person.UpdatePersonRequest;
 import com.matheushdas.restfulapi.model.Person;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class PersonMapper {
         }
 
         return response;
+    }
+
+    public Page<PersonResponse> toResponsePage(Page<Person> data) {
+        return data.map(person -> this.toResponse(person));
     }
 
     public Person toEntity(CreatePersonRequest data) {

@@ -11,6 +11,7 @@ import com.matheushdas.restfulapi.repository.PersonRepository;
 import com.matheushdas.restfulapi.service.PersonService;
 import com.matheushdas.restfulapi.unit.mock.PersonMockProvider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,31 +42,6 @@ public class PersonServiceTest {
     void setUp() {
         input = new PersonMockProvider();
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void shouldReturnListPersonResponseWithHateoasLink_whenFindAll() {
-        List<Person> people = input.mockEntityList();
-
-        when(personRepository.findAll()).thenReturn(people);
-        when(personMapper.toResponseList(people)).thenReturn(input.mockVOList());
-
-        int i = 0;
-
-        for(PersonResponse result : personService.findAll()) {
-            assertNotNull(result);
-            assertNotNull(result.getKey());
-            assertNotNull(result.getLinks());
-
-            assertTrue(result.toString().contains("links: [</api/person/" + i + ">;rel=\"self\"]"));
-
-            assertEquals(people.get(i).getId(), result.getKey());
-            assertEquals(people.get(i).getFirstName(), result.getFirstName());
-            assertEquals(people.get(i).getLastName(), result.getLastName());
-            assertEquals(people.get(i).getAddress(), result.getAddress());
-            assertEquals(people.get(i).getGender(), result.getGender());
-            i++;
-        }
     }
 
     @Test
@@ -138,9 +112,7 @@ public class PersonServiceTest {
         UpdatePersonRequest request = input.mockUpdateRequest(1);
         Person person = input.mockEntity(1);
 
-
-        when(personRepository.existsById(request.id())).thenReturn(true);
-        when(personMapper.toEntity(request)).thenReturn(person);
+        when(personRepository.findById(request.id())).thenReturn(Optional.of(person));
         when(personRepository.save(person)).thenReturn(person);
         when(personMapper.toResponse(person)).thenReturn(input.mockVO(1));
 
@@ -160,6 +132,7 @@ public class PersonServiceTest {
     }
 
     @Test
+    @Order(6)
     void shouldThrowRequiredObjectIsNullException_whenUpdateWithNull() {
         Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
             personService.update(null);

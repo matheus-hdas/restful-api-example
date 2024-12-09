@@ -8,9 +8,13 @@ import com.matheushdas.restfulapi.exception.RequiredObjectIsNullException;
 import com.matheushdas.restfulapi.exception.ResourceNotFoundException;
 import com.matheushdas.restfulapi.mapper.BookMapper;
 import com.matheushdas.restfulapi.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -19,22 +23,51 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class BookService {
     private BookRepository bookRepository;
     private BookMapper bookMapper;
+    private PagedResourcesAssembler<BookResponse> resourcesAssembler;
 
-    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
+    public BookService(BookRepository bookRepository, BookMapper bookMapper, PagedResourcesAssembler<BookResponse> resourcesAssembler) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+        this.resourcesAssembler = resourcesAssembler;
     }
 
-    public List<BookResponse> findAll() {
-        return bookMapper
-                .toResponseList(bookRepository.findAll())
-                .stream()
+    public PagedModel<EntityModel<BookResponse>> findAll(Pageable pageable) {
+        Page page = bookMapper
+                .toResponsePage(bookRepository.findAll(pageable))
                 .map(p -> p.add(
                         linkTo(
                                 methodOn(BookController.class)
                                         .getBookById(p.getKey()))
-                                .withSelfRel()))
-                .toList();
+                                .withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(BookController.class)
+                        .getAllBooks(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc"))
+                .withSelfRel();
+        return resourcesAssembler.toModel(page, link);
+    }
+
+    public PagedModel<EntityModel<BookResponse>> findByTitle(String title, Pageable pageable) {
+        Page page = bookMapper
+                .toResponsePage(bookRepository.findByTitle(title, pageable))
+                .map(p -> p.add(
+                        linkTo(
+                                methodOn(BookController.class)
+                                        .getBookById(p.getKey()))
+                                .withSelfRel()));
+
+        Link link = linkTo(
+                methodOn(BookController.class)
+                        .getBooksByTitle(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                "asc",
+                                title))
+                .withSelfRel();
+        return resourcesAssembler.toModel(page, link);
     }
 
     public BookResponse findById(Long id) {
