@@ -34,9 +34,10 @@ jobs:
       run: docker compose build
 
     - name: Docker Push
-      run: docker tag ${{ secrets.DOCKER_USERNAME }/restful-api-example:latest ${{ secrets.DOCKER_USERNAME }/restful-api-example:${{ github.run_id }} \ 
-           docker push ${{ secrets.DOCKER_USERNAME }}/restful-api-example:${{ github.run_id }} \
-           docker push ${{ secrets.DOCKER_USERNAME }}/restful-api-example:latest
+      run: |
+        docker tag ${{ secrets.DOCKER_USERNAME }}/restful-api-example:latest ${{ secrets.DOCKER_USERNAME }}/restful-api-example:${{ github.run_id }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/restful-api-example:${{ github.run_id }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/restful-api-example:latest
       
 
       
